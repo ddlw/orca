@@ -129,7 +129,7 @@ describe('UI IPC', () => {
       for (let index = 0; index < 20; index++) {
         const update: PersistedUIState = {
           ...snapshot,
-          activeView: index % 2 === 0 ? 'agents' : 'terminal'
+          activeView: index % 2 === 0 ? 'tasks' : 'terminal'
         }
         publish(update)
         expect(mainSend).toHaveBeenNthCalledWith(index + 1, 'ui:stateChanged', update)
