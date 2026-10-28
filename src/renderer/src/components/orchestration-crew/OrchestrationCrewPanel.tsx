@@ -83,17 +83,30 @@ function IconButton({
   )
 }
 
+function runningWorker(row: OrchestrationCrewRow): boolean {
+  return Boolean(
+    row.sendAddress &&
+    row.task &&
+    !['completed', 'failed'].includes(row.task.state) &&
+    (row.task.state === 'dispatched' || ['working', 'waiting', 'blocked'].includes(row.status))
+  )
+}
+
 type PanelProps = {
   target: RuntimeClientTarget
   party: string
+  canMention: boolean
+  mention: (rows: OrchestrationCrewRow[]) => void
 }
 export function OrchestrationCrewPanel(props: PanelProps): React.JSX.Element | null {
   const snapshot = useOrchestrationCrew(props.target, props.party)
   return <CrewPanelContent {...props} snapshot={snapshot} />
 }
 
-function CrewPanelContent({
+export function CrewPanelContent({
   target,
+  canMention,
+  mention,
   snapshot
 }: PanelProps & { snapshot: OrchestrationCrewSnapshot }): React.JSX.Element | null {
   const [open, setOpen] = useState(false)
@@ -164,9 +177,26 @@ function CrewPanelContent({
                   <div className="flex items-center gap-1.5 px-3 pb-1 pt-3 text-2xs font-semibold uppercase tracking-wider text-muted-foreground">
                     <span>{title}</span>
                     <span>{rows.length}</span>
+                    {title === 'Managing' ? (
+                      <Button
+                        variant="ghost"
+                        size="xs"
+                        className="ml-auto normal-case tracking-normal"
+                        disabled={!canMention || !rows.some(runningWorker)}
+                        onClick={() => mention(rows.filter(runningWorker))}
+                      >
+                        Mention all
+                      </Button>
+                    ) : null}
                   </div>
                   {rows.map((row) => (
-                    <CrewRowView key={row.partyKey} row={row} target={target} />
+                    <CrewRowView
+                      key={row.partyKey}
+                      row={row}
+                      target={target}
+                      canMention={canMention}
+                      mention={() => mention([row])}
+                    />
                   ))}
                 </section>
               ) : null
@@ -211,7 +241,17 @@ function CrewPanelContent({
   )
 }
 
-function CrewRowView({ row, target }: { row: OrchestrationCrewRow; target: RuntimeClientTarget }) {
+function CrewRowView({
+  row,
+  target,
+  canMention,
+  mention
+}: {
+  row: OrchestrationCrewRow
+  target: RuntimeClientTarget
+  canMention: boolean
+  mention: () => void
+}) {
   const [disclosure, setDisclosure] = useState<{ question?: string; expanded: boolean }>()
   const question = row.pendingQuestion?.at
   const expanded =
@@ -227,8 +267,9 @@ function CrewRowView({ row, target }: { row: OrchestrationCrewRow; target: Runti
         <Button
           variant="ghost"
           className="h-auto min-w-0 flex-1 justify-start gap-2 px-1 py-1 text-left"
-          aria-expanded={expanded}
-          onClick={() => setDisclosure({ question, expanded: !expanded })}
+          disabled={!canMention || !row.sendAddress}
+          onPointerDown={(event) => event.preventDefault()}
+          onClick={mention}
         >
           <Avatar row={row} />
           <span className="min-w-0 flex-1">
@@ -264,6 +305,9 @@ function CrewRowView({ row, target }: { row: OrchestrationCrewRow; target: Runti
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onCloseAutoFocus={(event) => event.preventDefault()}>
+                <DropdownMenuItem disabled={!canMention || !row.sendAddress} onSelect={mention}>
+                  Mention in message
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={open}>Open its chat</DropdownMenuItem>
                 <DropdownMenuItem
                   disabled={!row.sendAddress}

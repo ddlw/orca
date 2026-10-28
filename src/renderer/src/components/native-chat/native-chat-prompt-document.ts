@@ -1,3 +1,4 @@
+import { agentReferenceToken } from '../../../../shared/orchestration-agent-reference'
 import { NativeChatFileReferencePill } from './NativeChatFileReferencePill'
 import { NativeChatSkillPill, skillLabel } from './NativeChatSkillPill'
 import { NativeChatImageReferencePill } from './NativeChatImageReferencePill'
@@ -86,6 +87,13 @@ export function fileReferenceContent(path: string): JSONContent {
 
 /** A pill reads as its token and a hard break as a newline, so the text is what the agent receives. */
 export function promptLeafText(node: ProseMirrorNode): string {
+  if (node.type.name === 'nativeChatAgentReference') {
+    return agentReferenceToken({
+      label: String(node.attrs.label),
+      address: String(node.attrs.address),
+      hostKey: String(node.attrs.hostKey)
+    })
+  }
   if (node.type.name === IMAGE_REFERENCE_NODE) {
     return imageReferenceToken(String(node.attrs.attachmentId))
   }

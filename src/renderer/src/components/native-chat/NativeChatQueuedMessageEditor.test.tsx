@@ -368,6 +368,7 @@ describe('queued card image edit', () => {
     vi.stubGlobal('navigator', { userAgent: 'Windows', clipboard: undefined })
     const composer: NativeChatComposerHandle = {
       focus: vi.fn(() => true),
+      insertAgentReferences: () => false,
       insertTypedText: () => true,
       acceptsText: () => true,
       appendText: vi.fn(),

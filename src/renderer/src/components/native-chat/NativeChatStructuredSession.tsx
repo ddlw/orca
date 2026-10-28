@@ -288,7 +288,15 @@ export function NativeChatStructuredSession(
     >
       {nativeChatPaneHeader(props, ownerWorktreeId, appearanceStyle.colorScheme, handOff)}
       <div className="relative flex min-h-0 flex-1 flex-col">
-        <NativeChatCrewPanel target={props.target} sessionId={props.sessionId} />
+        <NativeChatCrewPanel
+          {...props}
+          composerRef={composerRef}
+          canMention={
+            composerShown &&
+            stopControls.composer.canSend !== false &&
+            install.unavailableHint === undefined
+          }
+        />
         <NativeChatContextClearFade clearing={controller.contextClear.clearing}>
           {find.isOpen ? <NativeChatFindBar find={find} isVisible={props.isVisible} /> : null}
           {viewState.kind === 'loading' || (viewState.kind === 'error' && !readFailure) ? (

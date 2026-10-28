@@ -344,7 +344,11 @@ export function NativeChatResolvedView({
       style={appearanceStyle}
       data-native-chat-scheme={appearanceStyle.colorScheme}
     >
-      <NativeChatCrewPanel {...crew} />
+      <NativeChatCrewPanel
+        {...crew}
+        composerRef={composerRef}
+        canMention={canSend && !shownPromptCard && targetPtyId !== null}
+      />
       <div className="relative flex min-h-0 flex-1 flex-col">
         {find.isOpen ? <NativeChatFindBar find={find} isVisible={isVisible} /> : null}
         {viewState.kind === 'loading' ? (

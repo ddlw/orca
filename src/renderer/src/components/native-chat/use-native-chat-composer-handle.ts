@@ -49,6 +49,15 @@ export function useNativeChatComposerHandle(
   useImperativeHandle(
     ref,
     () => ({
+      insertAgentReferences: (references) => {
+        const input = textareaRef.current
+        if (!input || input.disabled || !input.insertAgentReferences || isComposing()) {
+          return false
+        }
+        input.insertAgentReferences(references)
+        input.focus()
+        return true
+      },
       focus,
       insertTypedText,
       acceptsText,
@@ -58,6 +67,8 @@ export function useNativeChatComposerHandle(
       contains
     }),
     [
+      textareaRef,
+      isComposing,
       focus,
       insertTypedText,
       acceptsText,

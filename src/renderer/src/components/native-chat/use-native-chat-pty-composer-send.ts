@@ -1,3 +1,5 @@
+import { readNativeChatComposerDraft } from './native-chat-composer-draft-store'
+import { serializeNativeChatAgentReferences } from './native-chat-agent-reference-send'
 import {
   admitNativeChatPastedText,
   resolveNativeChatPastedText
@@ -74,7 +76,13 @@ export function useNativeChatPtyComposerSend(args: {
     if (!admitNativeChatPastedText(args.draftScopeKey, text, args.setNotice)) {
       return
     }
-    text = resolveNativeChatPastedText(args.draftScopeKey, text)
+    text = resolveNativeChatPastedText(
+      args.draftScopeKey,
+      serializeNativeChatAgentReferences(
+        text,
+        readNativeChatComposerDraft(args.draftScopeKey).document
+      )
+    )
     const { sendOptions: launchSendOptions } = resolveNativeChatLaunchDraftSend({
       launchDraft: args.launchDraft,
       launchDraftResolved: args.launchDraftResolved,
