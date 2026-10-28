@@ -356,6 +356,27 @@ describe('terminal link action routing', () => {
     expect(openRuntimeBrowserTab).not.toHaveBeenCalled()
   })
 
+  it.each([
+    [false, false],
+    [false, true],
+    [true, false],
+    [true, true]
+  ])(
+    'keeps Shift on the only primary destination with openLinksInApp=%s and inversion=%s',
+    (openLinksInApp, openLinksInAppModifierInverts) => {
+      settings = { openLinksInApp, openLinksInAppModifierInverts }
+      const event = { ...plainEvent(), metaKey: true, shiftKey: true }
+
+      handleTerminalHttpLink('https://example.com/path', event, {
+        worktreeId: 'wt-1',
+        actionDestinations: { primary: 'system' }
+      })
+
+      expect(openUrl).toHaveBeenCalledWith('https://example.com/path')
+      expect(openRuntimeBrowserTab).not.toHaveBeenCalled()
+    }
+  )
+
   it('exposes the actual hidden OSC 8 destination', () => {
     const request = vi.fn()
     const destination = 'https://example.com'

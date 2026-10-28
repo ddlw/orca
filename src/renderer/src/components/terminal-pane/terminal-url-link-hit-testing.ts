@@ -70,8 +70,11 @@ export function handleTerminalHttpLink(
   deps: UrlLinkHitTestDeps
 ): boolean {
   if (isTerminalHttpLinkActivation(event)) {
-    // Plain clicks use primary; Shift follows the shared link-routing inversion setting.
-    const forceDestination = event?.shiftKey ? undefined : deps.actionDestinations?.primary
+    // Shift can invert only when both destinations are available; otherwise honor the sole destination.
+    const forceDestination =
+      event?.shiftKey && deps.actionDestinations?.alternate
+        ? undefined
+        : deps.actionDestinations?.primary
     openRoutedHttpLink(url, {
       ...deps,
       modifierHeld: Boolean(event?.shiftKey),
