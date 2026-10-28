@@ -2,6 +2,7 @@
 export type ServeOrcaAppArgs = {
   json?: boolean
   port?: string | null
+  bind?: string | null
   pairingAddress?: string | null
   noPairing?: boolean
   mobilePairing?: boolean
@@ -18,6 +19,7 @@ export function serveOptionArgs(args: ServeOrcaAppArgs, prefix: '--' | '--serve-
   return [
     ...(args.json ? [`${prefix}json`] : []),
     ...(args.port ? [`${prefix}port`, args.port] : []),
+    ...(args.bind ? [`${prefix}bind`, args.bind] : []),
     ...(args.pairingAddress ? [`${prefix}pairing-address`, args.pairingAddress] : []),
     ...(args.noPairing ? [`${prefix}no-pairing`] : []),
     ...(args.mobilePairing ? [`${prefix}mobile-pairing`] : []),
@@ -34,10 +36,11 @@ export function orcadServeArgs(
   webClientRoot?: string,
   bindHost = '0.0.0.0'
 ): string[] {
+  const { bind, ...options } = args
   return [
     '--bind',
-    bindHost,
-    ...serveOptionArgs(args, '--'),
+    bind ?? bindHost,
+    ...serveOptionArgs(options, '--'),
     ...(webClientRoot ? ['--web-client-root', webClientRoot] : [])
   ]
 }

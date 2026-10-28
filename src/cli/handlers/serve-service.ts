@@ -5,6 +5,7 @@ import { runProcess } from '@orca/process-host'
 import type { CommandHandler } from '../dispatch'
 import { RuntimeClientError } from '../runtime/types'
 import { getOptionalServePort } from '../runtime/serve-port-flag'
+import { getOptionalStringFlag } from '../flags'
 import { formatServeServiceInstall, formatServeServiceStatus } from './serve-service-format'
 import { resolveLaunchUserDataPath } from '../runtime/launch-user-data-path'
 import { getPlatformUserDataPath } from '../runtime/metadata'
@@ -59,7 +60,12 @@ function requireManager(platform: NodeJS.Platform): void {
 
 function serviceSpec(
   deps: ServeServiceDeps,
-  options: { command: string; port?: string | null; pairingAddress?: string | null }
+  options: {
+    command: string
+    port?: string | null
+    bind?: string | null
+    pairingAddress?: string | null
+  }
 ): ServeServiceSpec {
   return renderServeService({
     platform: deps.platform,
@@ -69,6 +75,7 @@ function serviceSpec(
     defaultUserDataPath: getPlatformUserDataPath(deps.platform, deps.homeDir),
     path: deps.env.PATH ?? '/usr/bin:/bin',
     port: options.port,
+    bind: options.bind,
     pairingAddress: options.pairingAddress
   })
 }
@@ -98,6 +105,7 @@ export async function installServeService(
   options: {
     command: string | null
     port?: string | null
+    bind?: string | null
     pairingAddress?: string | null
     dryRun: boolean
   },
@@ -242,6 +250,7 @@ export const SERVE_SERVICE_HANDLERS: Record<string, CommandHandler> = {
       command: optionalString(flags.get('command')),
       // Validate before launchd can loop on a bad value and trip the supervisor brake.
       port: getOptionalServePort(flags),
+      bind: getOptionalStringFlag(flags, 'bind'),
       pairingAddress: optionalString(flags.get('pairing-address')),
       dryRun: flags.get('dry-run') === true
     })
