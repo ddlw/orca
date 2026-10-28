@@ -59,7 +59,7 @@ vi.mock('./browser-extension-profile-reload', () => ({
 }))
 
 const extensionId = 'a'.repeat(32)
-const renderers: ReturnType<typeof renderer>[] = []
+const renderers: EventEmitter[] = []
 const installs: Promise<BrowserExtensionWebStoreInstallResult>[] = []
 let service: typeof ServiceModule
 let prompt: typeof PromptModule
