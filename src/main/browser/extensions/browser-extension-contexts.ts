@@ -153,8 +153,7 @@ export function setFrameListening(
   setListenerFilters(context.filters, key, active ? filters : undefined)
   if (!trackedWebContents.has(webContents)) {
     trackedWebContents.add(webContents)
-    const webSession = webContents.session
-    const webContentsId = webContents.id
+    const { session: webSession, id: webContentsId } = webContents
     abortWhenRendererGone(webContents).signal.addEventListener('abort', () => {
       trackedWebContents.delete(webContents)
       stateBySession.get(webSession)?.frames.forEach((candidate, candidateKey, frames) => {
@@ -207,11 +206,8 @@ export function dispatchToWorkerWhenListening(
     return
   }
   const key = eventKey(namespace, event)
-  const context = ensureWorkerContext(
-    state,
-    extensionId,
-    `${getChromeExtensionOrigin(extensionId)}/`
-  )
+  const scope = `${getChromeExtensionOrigin(extensionId)}/`
+  const context = ensureWorkerContext(state, extensionId, scope)
   const payload: BrowserExtensionEventPayload = { namespace, event, args }
   if (context.events.has(key)) {
     deliverToWorker(sess, context, key, payload, startWorker)
