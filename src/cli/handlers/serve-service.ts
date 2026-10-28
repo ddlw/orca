@@ -6,6 +6,7 @@ import type { CommandHandler } from '../dispatch'
 import { RuntimeClientError } from '../runtime/types'
 import { getOptionalServePort } from '../runtime/serve-port-flag'
 import { getOptionalStringFlag } from '../flags'
+import { resolveOrcadBindHost } from '../../main/orcad/orcad-bind-address'
 import { formatServeServiceInstall, formatServeServiceStatus } from './serve-service-format'
 import { resolveLaunchUserDataPath } from '../runtime/launch-user-data-path'
 import { getPlatformUserDataPath } from '../runtime/metadata'
@@ -58,6 +59,20 @@ function requireManager(platform: NodeJS.Platform): void {
   }
 }
 
+function resolveServeServiceBind(raw: string | null | undefined): string | null {
+  if (raw === null || raw === undefined) {
+    return null
+  }
+  try {
+    return resolveOrcadBindHost(raw)
+  } catch (error) {
+    throw new RuntimeClientError(
+      'invalid_argument',
+      error instanceof Error ? error.message : `Invalid --bind value: ${raw}`
+    )
+  }
+}
+
 function serviceSpec(
   deps: ServeServiceDeps,
   options: {
@@ -75,7 +90,7 @@ function serviceSpec(
     defaultUserDataPath: getPlatformUserDataPath(deps.platform, deps.homeDir),
     path: deps.env.PATH ?? '/usr/bin:/bin',
     port: options.port,
-    bind: options.bind,
+    bind: resolveServeServiceBind(options.bind),
     pairingAddress: options.pairingAddress
   })
 }
