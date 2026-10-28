@@ -5,8 +5,7 @@ import { runProcess } from '@orca/process-host'
 import type { CommandHandler } from '../dispatch'
 import { RuntimeClientError } from '../runtime/types'
 import { getOptionalServePort } from '../runtime/serve-port-flag'
-import { getOptionalStringFlag } from '../flags'
-import { resolveOrcadBindHost } from '../../main/orcad/orcad-bind-address'
+import { getOptionalServeBind, resolveServeBindValue } from '../runtime/serve-bind-flag'
 import { formatServeServiceInstall, formatServeServiceStatus } from './serve-service-format'
 import { resolveLaunchUserDataPath } from '../runtime/launch-user-data-path'
 import { getPlatformUserDataPath } from '../runtime/metadata'
@@ -63,14 +62,7 @@ function resolveServeServiceBind(raw: string | null | undefined): string | null 
   if (raw === null || raw === undefined) {
     return null
   }
-  try {
-    return resolveOrcadBindHost(raw)
-  } catch (error) {
-    throw new RuntimeClientError(
-      'invalid_argument',
-      error instanceof Error ? error.message : `Invalid --bind value: ${raw}`
-    )
-  }
+  return resolveServeBindValue(raw)
 }
 
 function serviceSpec(
@@ -265,7 +257,7 @@ export const SERVE_SERVICE_HANDLERS: Record<string, CommandHandler> = {
       command: optionalString(flags.get('command')),
       // Validate before launchd can loop on a bad value and trip the supervisor brake.
       port: getOptionalServePort(flags),
-      bind: getOptionalStringFlag(flags, 'bind'),
+      bind: getOptionalServeBind(flags),
       pairingAddress: optionalString(flags.get('pairing-address')),
       dryRun: flags.get('dry-run') === true
     })
