@@ -2,6 +2,7 @@ import { resolveOrcadBindHost } from '../../main/orcad/orcad-bind-address'
 import { getPresentStringFlag } from '../flags'
 import { RuntimeClientError } from './types'
 
+/** Convert a CLI bind value into the normalized literal address used by serve. */
 export function resolveServeBindValue(raw: string): string {
   try {
     return resolveOrcadBindHost(raw)

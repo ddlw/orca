@@ -15,6 +15,7 @@ export type ServeOrcaAppArgs = {
   supervise?: boolean
 }
 
+/** Serialize optional serve flags for either the CLI or Electron's internal argv form. */
 export function serveOptionArgs(args: ServeOrcaAppArgs, prefix: '--' | '--serve-'): string[] {
   return [
     ...(args.json ? [`${prefix}json`] : []),

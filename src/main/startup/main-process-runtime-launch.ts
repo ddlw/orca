@@ -79,6 +79,7 @@ function e2eHeadlessServeWithoutBrowser(): boolean {
   )
 }
 
+/** Construct the runtime RPC server with serve-specific bind and port exposure settings. */
 function installRuntimeRpc(
   runtime: RuntimeService,
   serveOptions: ReturnType<typeof getServeOptions> | null

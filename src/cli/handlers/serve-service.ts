@@ -58,6 +58,7 @@ function requireManager(platform: NodeJS.Platform): void {
   }
 }
 
+/** Normalize an optional service bind value while preserving the omitted default. */
 function resolveServeServiceBind(raw: string | null | undefined): string | null {
   if (raw === null || raw === undefined) {
     return null
@@ -65,6 +66,7 @@ function resolveServeServiceBind(raw: string | null | undefined): string | null 
   return resolveServeBindValue(raw)
 }
 
+/** Build the platform service unit after validating all serve network options. */
 function serviceSpec(
   deps: ServeServiceDeps,
   options: {
@@ -108,6 +110,7 @@ async function mustRun(deps: ServeServiceDeps, program: string, args: string[]):
   }
 }
 
+/** Render and optionally install the supervised serve service for the current platform. */
 export async function installServeService(
   options: {
     command: string | null

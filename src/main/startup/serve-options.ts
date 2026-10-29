@@ -92,6 +92,7 @@ function hasFlag(argv: readonly string[], flags: readonly string[]): boolean {
   return argv.some((token) => flagNames.has(optionName(token)))
 }
 
+/** Parse and validate the serve options shared by direct CLI and Electron startup paths. */
 export function getServeOptions(argv: readonly string[]): ServeOptions {
   const optionsArgv = optionsBeforeTerminator(argv)
   const typoError = getServeFlagTypoError(optionsArgv)
